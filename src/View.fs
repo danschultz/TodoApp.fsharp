@@ -19,7 +19,7 @@ let internal onEnter msg dispatch =
     |> OnKeyDown
 
 let header model dispatch =
-    R.header [] [
+    R.header [ ClassName "header" ] [
         R.h1 [] [ R.str "Todos" ]
         R.input [
             onEnter Add dispatch
@@ -29,8 +29,17 @@ let header model dispatch =
     ]
 
 let footer model dispatch =
-    R.footer [] [
-        R.div [] [ R.str "" ]
+    let remainingTodos =
+        model
+        |> App.remainingTodos
+        |> List.length
+    let completedTodos =
+        model
+        |> App.completedTodos
+        |> List.length
+
+    R.footer [ ClassName "footer" ] [
+        R.div [] [ R.str ((string remainingTodos) + " items left") ]
         R.div [] [
             R.a [ Href "#/"
                   OnClick (fun _ -> dispatch (ChangeVisibility All)) ]
@@ -44,11 +53,22 @@ let footer model dispatch =
                   OnClick (fun _ -> dispatch (ChangeVisibility Completed))]
                 [ R.str "Completed" ]
         ]
+        R.div [] [
+            R.button
+                [ ClassName "clear-completed"
+                  Hidden (completedTodos = 0)
+                  OnClick (fun _ -> dispatch RemoveCompleted) ]
+                [ R.str ("Clear completed (" + string completedTodos + ")") ]
+        ]
     ]
 
 let viewTodo todo dispatch =
-    R.div [ OnDoubleClick (fun ev -> dispatch (BeginEditing todo.id))] [
-        R.button [ OnClick (fun ev -> dispatch (Toggle todo.id))] [ R.str "" ]
+    R.div [ OnDoubleClick (fun ev -> dispatch (BeginEditing todo.id)) ] [
+        R.input
+            [ Type "checkbox"
+              ClassName "toggle"
+              Checked todo.completed
+              OnClick (fun ev -> dispatch (Toggle todo.id)) ]
         R.div [] [ R.str todo.description ]
         R.button [ OnClick (fun ev -> dispatch (Remove todo.id))] [ R.str "Delete" ]
     ]
@@ -64,11 +84,13 @@ let editTodo todo dispatch =
 
 let todos todos dispatch =
     let view dispatch todo =
-        if not todo.editing then viewTodo todo dispatch else editTodo todo dispatch
-    R.div [] (List.map (view dispatch) todos)
+        R.li [ ClassName "todo" ] [
+            (if not todo.editing then viewTodo todo dispatch else editTodo todo dispatch)
+        ]
+    R.ul [ ClassName "todos" ] (List.map (view dispatch) todos)
 
 let root model dispatch =
-    R.div [] [
+    R.div [ ClassName "todos-app" ] [
         header model.newTodo dispatch
         todos (App.todos model) dispatch
         footer model dispatch

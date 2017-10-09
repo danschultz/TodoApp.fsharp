@@ -20,6 +20,7 @@ type App =
 type Cmd =
     | Add
     | Remove of int
+    | RemoveCompleted
     | Toggle of int
     | BeginEditing of int
     | Edit of int * string
@@ -73,6 +74,9 @@ module App =
         let edit todo = if todo.id = todoId then Todo.endEditing todo else todo
         { app with todos = List.map edit app.todos }
 
+    let removeCompleted app =
+        { app with todos = List.filter (Todo.isState Active) app.todos }
+
     let changeVisibility app filter = { app with filter = filter }
 
     let todos app = List.filter (Todo.isState app.filter) app.todos
@@ -85,6 +89,7 @@ module App =
         match msg with
         | Add -> addTodo app
         | Remove id -> removeTodo app id
+        | RemoveCompleted -> removeCompleted app
         | Toggle id -> toggleTodo app id
         | BeginEditing id -> beginEditing app id
         | Edit (id, desc) -> edit app id desc
