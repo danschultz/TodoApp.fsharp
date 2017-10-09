@@ -57,3 +57,11 @@ module App =
 
     let todos app =
         List.filter (Todo.isVisible app.filter) app.todos
+
+    let update msg app =
+        match msg with
+        | Add -> addTodo app
+        | Remove id -> removeTodo app id
+        | Toggle id -> toggleTodo app id
+        | ChangeVisibility filter -> changeVisibility app filter
+        | UpdateField value -> { app with newTodo = value }
