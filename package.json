@@ -18,6 +18,7 @@
     "fable-loader": "1.1.2",
     "fable-utils": "1.0.6",
     "loglevel": "1.5.0",
+    "remotedev": "^0.2.7",
     "webpack": "3.6.0",
     "webpack-dev-server": "2.8.2"
   }

@@ -1,42 +1,46 @@
-var path = require("path");
-var webpack = require("webpack");
-var fableUtils = require("fable-utils");
+var path = require('path')
+var webpack = require('webpack')
+var fableUtils = require('fable-utils')
 
 function resolve(filePath) {
   return path.join(__dirname, filePath)
 }
 
 var babelOptions = fableUtils.resolveBabelOptions({
-  presets: [["es2015", { "modules": false }]],
-  plugins: ["transform-runtime"]
-});
+  presets: [['es2015', { modules: false }]],
+  plugins: ['transform-runtime']
+})
 
-var isProduction = process.argv.indexOf("-p") >= 0;
-console.log("Bundling for " + (isProduction ? "production" : "development") + "...");
+var isProduction = process.argv.indexOf('-p') >= 0
+console.log(
+  'Bundling for ' + (isProduction ? 'production' : 'development') + '...'
+)
 
 module.exports = {
-  devtool: "source-map",
+  devtool: 'source-map',
   entry: resolve('./src/TodoApp.fsproj'),
   output: {
     filename: 'bundle.js',
-    path: resolve('./public'),
+    path: resolve('./public')
   },
   resolve: {
-    modules: [resolve("./node_modules/")]
+    modules: [resolve('./node_modules/')]
   },
   devServer: {
     contentBase: resolve('./public'),
-    port: 8080
+    port: 8080,
+    hot: true,
+    inline: true
   },
   module: {
     rules: [
       {
         test: /\.fs(x|proj)?$/,
         use: {
-          loader: "fable-loader",
+          loader: 'fable-loader',
           options: {
             babel: babelOptions,
-            define: isProduction ? [] : ["DEBUG"]
+            define: isProduction ? [] : ['DEBUG']
           }
         }
       },
@@ -46,8 +50,14 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: babelOptions
-        },
+        }
       }
     ]
-  }
-};
+  },
+  plugins: isProduction
+    ? []
+    : [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin()
+      ]
+}
