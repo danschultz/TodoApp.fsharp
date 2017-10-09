@@ -11,6 +11,7 @@ let update msg model =
     | Add -> App.addTodo model
     | Remove id -> App.removeTodo model id
     | Toggle id -> App.toggleTodo model id
+    | ChangeVisibility filter -> App.changeVisibility model filter
     | UpdateField value -> { model with newTodo = value }
 
 Program.mkSimple App.init update View.root

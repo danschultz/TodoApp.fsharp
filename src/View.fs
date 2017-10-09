@@ -28,6 +28,21 @@ let header model dispatch =
         ]
     ]
 
+let footer filter dispatch =
+    R.footer [] [
+        R.a [ Href "#/"
+              OnClick (fun _ -> dispatch (ChangeVisibility All)) ]
+            [ R.str "All" ]
+        R.str " "
+        R.a [ Href "#/active"
+              OnClick (fun _ -> dispatch (ChangeVisibility Active)) ]
+            [ R.str "Active" ]
+        R.str " "
+        R.a [ Href "#/completed"
+              OnClick (fun _ -> dispatch (ChangeVisibility Completed))]
+            [ R.str "Completed" ]
+    ]
+
 let todo todo dispatch =
     R.div [] [
         R.button [ OnClick (fun ev -> dispatch (Toggle todo.id))] [ R.str "" ]
@@ -40,6 +55,7 @@ let todos todos dispatch =
 
 let root model dispatch =
     R.div [] [
-        (header model.newTodo dispatch)
-        todos model.todos dispatch
+        header model.newTodo dispatch
+        todos (App.todos model) dispatch
+        footer model.filter dispatch
     ]
