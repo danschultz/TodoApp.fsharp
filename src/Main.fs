@@ -1,7 +1,5 @@
 module TodoApp
 
-open Fable.Core
-open Fable.Import
 open Elmish
 open Elmish.React
 open Elmish.Debug

@@ -28,34 +28,48 @@ let header model dispatch =
         ]
     ]
 
-let footer filter dispatch =
+let footer model dispatch =
     R.footer [] [
-        R.a [ Href "#/"
-              OnClick (fun _ -> dispatch (ChangeVisibility All)) ]
-            [ R.str "All" ]
-        R.str " "
-        R.a [ Href "#/active"
-              OnClick (fun _ -> dispatch (ChangeVisibility Active)) ]
-            [ R.str "Active" ]
-        R.str " "
-        R.a [ Href "#/completed"
-              OnClick (fun _ -> dispatch (ChangeVisibility Completed))]
-            [ R.str "Completed" ]
+        R.div [] [ R.str "" ]
+        R.div [] [
+            R.a [ Href "#/"
+                  OnClick (fun _ -> dispatch (ChangeVisibility All)) ]
+                [ R.str "All" ]
+            R.str " "
+            R.a [ Href "#/active"
+                  OnClick (fun _ -> dispatch (ChangeVisibility Active)) ]
+                [ R.str "Active" ]
+            R.str " "
+            R.a [ Href "#/completed"
+                  OnClick (fun _ -> dispatch (ChangeVisibility Completed))]
+                [ R.str "Completed" ]
+        ]
     ]
 
-let todo todo dispatch =
-    R.div [] [
+let viewTodo todo dispatch =
+    R.div [ OnDoubleClick (fun ev -> dispatch (BeginEditing todo.id))] [
         R.button [ OnClick (fun ev -> dispatch (Toggle todo.id))] [ R.str "" ]
         R.div [] [ R.str todo.description ]
         R.button [ OnClick (fun ev -> dispatch (Remove todo.id))] [ R.str "Delete" ]
     ]
 
+let editTodo todo dispatch =
+    R.div [] [
+        R.input [
+            DefaultValue todo.description
+            OnInput (fun ev -> dispatch (Edit (todo.id, !!ev.target?value)))
+            onEnter (EndEditing todo.id) dispatch
+        ]
+    ]
+
 let todos todos dispatch =
-    R.div [] (List.map (fun i -> todo i dispatch) todos)
+    let view dispatch todo =
+        if not todo.editing then viewTodo todo dispatch else editTodo todo dispatch
+    R.div [] (List.map (view dispatch) todos)
 
 let root model dispatch =
     R.div [] [
         header model.newTodo dispatch
         todos (App.todos model) dispatch
-        footer model.filter dispatch
+        footer model dispatch
     ]
